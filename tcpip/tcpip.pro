@@ -9,13 +9,25 @@ QMAKE_CXXFLAGS += -Wno-deprecated-copy
 # Sources and Headers ==========================================================
 
 INCLUDEPATH += \
-    include \
+    include
 
 SOURCES += \
+    src/gui_utils.cpp \
+    src/app_core.cpp \
+    src/file_sys.cpp \
+    src/network_client.cpp \
+    src/system_utils.cpp \
+    src/convert.cpp \
     main.cpp \
     mainwindow.cpp
 
 HEADERS += \
+    include/gui_utils.h \
+    include/app_core.h \
+    include/file_sys.h \
+    include/network_client.h \
+    include/system_utils.h \
+    include/convert.h \
     mainwindow.h
 
 FORMS += \

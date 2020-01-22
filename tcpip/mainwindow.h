@@ -2,6 +2,7 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
+#include "NetworkClient"
 //==============================================================================
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -14,9 +15,20 @@ class MainWindow : public QMainWindow
 public:
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
+    QString lastError() const { return m_lastError; }
+
+private slots:
+    void on_lineEditIp_textChanged(const QString &arg1);
+    void on_buttonBox_accepted();
+    void on_buttonBox_rejected();
 
 private:
     Ui::MainWindow *ui;
+    bool m_actionEnabled {false};
+    QString m_lastError {""};
+    network_client::TcpIp4Struct m_host;
+    bool readParameters();
+    void updateControls();
 };
 //==============================================================================
 #endif // MAINWINDOW_H

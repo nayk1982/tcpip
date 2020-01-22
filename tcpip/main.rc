@@ -1,5 +1,7 @@
 ﻿#include <windows.h>
 
+CREATEPROCESS_MANIFEST_RESOURCE_ID RT_MANIFEST "tcpip.exe.manifest"
+
 #define VER_FILEVERSION             1,0,0,0
 #define VER_FILEVERSION_STR         "1.0.0.0\0"
 #define VER_PRODUCTVERSION          1,0,0
