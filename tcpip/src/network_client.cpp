@@ -153,6 +153,7 @@ bool isCorrectIp(const QString &ip)
 //==============================================================================
 bool hostSettings(TcpIp4Struct &host, QString &err)
 {
+    err = "";
     QList<QNetworkInterface> list = QNetworkInterface::allInterfaces();
     for(const QNetworkInterface &iface: list) {
 
@@ -171,6 +172,17 @@ bool hostSettings(TcpIp4Struct &host, QString &err)
                 host.mask = addr.netmask().toString();
                 host.broadcast = addr.broadcast().toString();
 
+                err += QString("Name: %1\n"
+                               "Address: %2\n"
+                               "Mask: %3\n"
+                               "Gateway: %4\n"
+                               "Broadcast: %5\n")
+                        .arg(host.name)
+                        .arg(host.addr)
+                        .arg(host.mask)
+                        .arg(host.gateway)
+                        .arg(host.broadcast);
+
                 QByteArray cmdOut;
                 if(system_utils::osCmd(
                             QString("netsh interface ip show config name=\"%1\"")
@@ -181,25 +193,42 @@ bool hostSettings(TcpIp4Struct &host, QString &err)
                     QString utfStr = codec->toUnicode(cmdOut);
                     QStringList strList = utfStr.split("\n", QString::SkipEmptyParts);
 
-                    for(int i=0; i<strList.size(); ++i) {
+                    for(int i=1; i<strList.size(); ++i) {
 
                         QString str = strList.at(i).trimmed().toLower();
-                        int n = str.indexOf(":", -1);
-                        err += str + "\n";
+                        int n = str.indexOf(':');
+                        if(n < 0) continue;
 
-                        if(str.contains("dhcp ") && (n > 0)) {
+                        if(str.contains("dhcp")) {
 
                             QString s = str.mid(n+1).trimmed();
                             host.dhcp = s.contains("да") || s.contains("yes");
                         }
-                        else if((n > 0) && (str.contains(" шлюз:") || str.contains("gateway:")) ) {
+                        else if(str.contains(" шлюз:") || str.contains("gateway:")) {
 
                             QString s = str.mid(n+1).trimmed();
                             if(isCorrectIp(s)) host.gateway = s;
                         }
-                        else if((n>0) && (str.contains(" dns-"))) {
+                        else if(str.contains("метрик") || str.contains("metric")) {
+
+                            QString s = str.mid(n+1).trimmed();
+                            int val = convert::strToIntDef(s, -1);
+                            if(val >= 0) {
+
+                                if(str.contains("шлюз") || str.contains("gateway")) {
+
+                                    host.gatewayMetric = val;
+                                }
+                                else if(str.contains("интерфейс") || str.contains("interface")) {
+
+                                    host.ifaceMetric = val;
+                                }
+                            }
+                        }
+                        else if(str.contains(" dns-")) {
 
                             host.autoDns = !str.contains("статич") && !str.contains("static");
+                            err += QString("Static DNS: %1\n").arg(!host.autoDns);
                             QString s = str.mid(n+1).trimmed();
                             QStringList tmpList = s.split(" ", QString::SkipEmptyParts);
                             if(!tmpList.isEmpty()) {
@@ -209,7 +238,7 @@ bool hostSettings(TcpIp4Struct &host, QString &err)
                                 if(tmpList.size() > 1) {
                                     s = tmpList.at(1).trimmed();
                                     if(isCorrectIp(s)) host.dns2 = s;
-                                }
+                                 }
                                 else if(i < strList.size()-1) {
                                     s = strList.at(i+1).toLower().trimmed();
                                     if(isCorrectIp(s)) host.dns2 = s;
@@ -217,6 +246,19 @@ bool hostSettings(TcpIp4Struct &host, QString &err)
                             }
                         }
                     }
+
+                    err += QString("Use DHCP: %1\n"
+                                   "Static DNS: %2\n"
+                                   "DNS1: %3\n"
+                                   "DNS2: %4\n"
+                                   "Gateway metric: %5\n"
+                                   "Iterface metric: %6\n")
+                            .arg(host.dhcp ? "yes" : "no")
+                            .arg(host.autoDns ? "no" : "yes")
+                            .arg(host.dns1)
+                            .arg(host.dns2)
+                            .arg(host.gatewayMetric)
+                            .arg(host.ifaceMetric);
                 }
                 else {
                     err = cmdOut;
@@ -229,6 +271,48 @@ bool hostSettings(TcpIp4Struct &host, QString &err)
 
     err = QObject::tr("Интерфейс не найден");
     return false;
+}
+//==============================================================================
+bool setHostSettings(const TcpIp4Struct &host, QString &err)
+{
+    if(!system_utils::osCmd(
+                QString("netsh interface ip set address name=\"%1\" static %2 %3 %4 %5")
+                .arg(host.name)
+                .arg(host.addr)
+                .arg(host.mask)
+                .arg(host.gateway)
+                .arg(host.gatewayMetric),
+                err,
+                20000)) {
+
+        return false;
+    }
+
+    err = QString("Name: %1\n"
+                  "Address: %2\n"
+                  "Mask: %3\n"
+                  "Gateway: %4\n"
+                  "Broadcast: %5\n")
+            .arg(host.name)
+            .arg(host.addr)
+            .arg(host.mask)
+            .arg(host.gateway)
+            .arg(host.broadcast);
+
+    err += QString("Use DHCP: %1\n"
+                   "Static DNS: %2\n"
+                   "DNS1: %3\n"
+                   "DNS2: %4\n"
+                   "Gateway metric: %5\n"
+                   "Iterface metric: %6\n")
+            .arg(host.dhcp ? "yes" : "no")
+            .arg(host.autoDns ? "no" : "yes")
+            .arg(host.dns1)
+            .arg(host.dns2)
+            .arg(host.gatewayMetric)
+            .arg(host.ifaceMetric);
+
+    return true;
 }
 //==============================================================================
 

@@ -43,7 +43,6 @@ MainWindow::MainWindow(QWidget *parent)
     readParameters();
     updateControls();
     m_actionEnabled = true;
-    gui_utils::messageError(m_lastError);
 }
 //==============================================================================
 MainWindow::~MainWindow()
@@ -59,7 +58,7 @@ bool MainWindow::readParameters()
         m_lastError = tr("Не удалось получить данные:\n%1").arg(err);
         return false;
     }
-    m_lastError = err;
+
     ui->labelTitle->setText(m_host.name);
     ui->lineEditIp->setText(m_host.addr);
     ui->lineEditMask->setText(m_host.mask);
@@ -85,31 +84,19 @@ void MainWindow::on_lineEditIp_textChanged(const QString &arg1)
 //==============================================================================
 void MainWindow::on_buttonBox_accepted()
 {
+    network_client::TcpIp4Struct host = m_host;
+
+    host.addr = ui->lineEditIp->text();
+    host.mask = ui->lineEditMask->text();
+    host.gateway = ui->lineEditGateway->text();
+
     QString result;
-    if(system_utils::osCmd(
-                QString("netsh.exe interface ip set address name=\"%1\" static %2 %3 %4 0")
-                .arg(m_host.name)
-                .arg(ui->lineEditIp->text())
-                .arg(ui->lineEditMask->text())
-                .arg(ui->lineEditGateway->text()),
-                result,
-                20000)) {
 
-        QNetworkAddressEntry entry;
-        if(!network_client::addressEntry(ui->lineEditIp->text(), entry)) {
+    if(network_client::setHostSettings(host, result)) {
 
-            gui_utils::messageError(tr("Не удалось установить адрес"));
-            return;
-        }
-
-        QByteArray buf = QString(ui->lineEditIp->text() + " "
-                                 + ui->lineEditMask->text() + " "
-                                 + ui->lineEditGateway->text())
-                .toLocal8Bit();
-        QString err;
         QString fileName = app_core::applicationFullPath() + "tcpip.dat";
-
-        file_sys::writeFile( fileName, buf, err );
+        QString err;
+        file_sys::writeFile( fileName, result.toLocal8Bit(), err );
         close();
     }
     else {
