@@ -226,7 +226,7 @@ bool hostSettings(TcpIp4Struct &host, QString &err)
                                 }
                             }
                         }
-                        else if(str.contains("dns-")) {
+                        else if(str.contains("dns-") || str.contains("dns server")) {
 
                             host.autoDns = str.contains("dhcp");
                             QString s = str.mid(n+1).trimmed();
