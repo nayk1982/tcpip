@@ -199,12 +199,13 @@ bool hostSettings(TcpIp4Struct &host, QString &err)
                         int n = str.indexOf(':');
                         if(n < 0) continue;
 
-                        if(str.contains("dhcp")) {
+                        if(str.contains("dhcp включен")
+                                || str.contains("dhcp разрешен") || str.contains("dhcp enable")) {
 
                             QString s = str.mid(n+1).trimmed();
                             host.dhcp = s.contains("да") || s.contains("yes");
                         }
-                        else if(str.contains(" шлюз:") || str.contains("gateway:")) {
+                        else if(str.contains("шлюз:") || str.contains("gateway:")) {
 
                             QString s = str.mid(n+1).trimmed();
                             if(isCorrectIp(s)) host.gateway = s;
@@ -225,10 +226,9 @@ bool hostSettings(TcpIp4Struct &host, QString &err)
                                 }
                             }
                         }
-                        else if(str.contains(" dns-")) {
+                        else if(str.contains("dns-")) {
 
-                            host.autoDns = !str.contains("статич") && !str.contains("static");
-                            err += QString("Static DNS: %1\n").arg(!host.autoDns);
+                            host.autoDns = str.contains("dhcp");
                             QString s = str.mid(n+1).trimmed();
                             QStringList tmpList = s.split(" ", QString::SkipEmptyParts);
                             if(!tmpList.isEmpty()) {
@@ -275,17 +275,53 @@ bool hostSettings(TcpIp4Struct &host, QString &err)
 //==============================================================================
 bool setHostSettings(const TcpIp4Struct &host, QString &err)
 {
-    if(!system_utils::osCmd(
-                QString("netsh interface ip set address name=\"%1\" static %2 %3 %4 %5")
-                .arg(host.name)
+    QString cmd = QString("netsh interface ip set address name=\"%1\" ")
+            .arg(host.name);
+
+    if(host.dhcp) {
+
+        cmd += "dhcp";
+    }
+    else {
+
+        cmd += QString("static %1 %2 %3 %4")
                 .arg(host.addr)
                 .arg(host.mask)
                 .arg(host.gateway)
-                .arg(host.gatewayMetric),
-                err,
-                20000)) {
+                .arg(host.gatewayMetric);
+    }
+
+    if(!system_utils::osCmd( cmd, err, 30000)) {
 
         return false;
+    }
+
+    cmd = QString("netsh interface ip set dns name=\"%1\" ")
+                .arg(host.name);
+
+    if(host.autoDns) {
+
+        cmd += "dhcp";
+    }
+    else {
+
+        cmd += QString("static %1").arg(host.dns1.isEmpty() ? "none" : host.dns1);
+    }
+
+    if(!system_utils::osCmd( cmd, err, 30000)) {
+
+        return false;
+    }
+
+    if(!host.autoDns && !host.dns1.isEmpty() && !host.dns2.isEmpty()) {
+
+        cmd = QString("netsh interface ip add dns name=\"%1\" %2")
+                    .arg(host.name).arg(host.dns2);
+
+        if(!system_utils::osCmd( cmd, err, 30000)) {
+
+            return false;
+        }
     }
 
     err = QString("Name: %1\n"

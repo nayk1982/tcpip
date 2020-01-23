@@ -21,6 +21,7 @@ private slots:
     void on_lineEditIp_textChanged(const QString &arg1);
     void on_buttonBox_accepted();
     void on_buttonBox_rejected();
+    void on_groupBoxAddress_toggled(bool arg1);
 
 private:
     Ui::MainWindow *ui;

@@ -36,9 +36,15 @@ MainWindow::MainWindow(QWidget *parent)
     ui->lineEditIp->setValidator(ipValidator);
     ui->lineEditMask->setValidator(ipValidator);
     ui->lineEditGateway->setValidator(ipValidator);
+    ui->lineEditDns1->setValidator(ipValidator);
+    ui->lineEditDns2->setValidator(ipValidator);
 
     connect(ui->lineEditMask, &QLineEdit::textChanged, this, &MainWindow::on_lineEditIp_textChanged);
     connect(ui->lineEditGateway, &QLineEdit::textChanged, this, &MainWindow::on_lineEditIp_textChanged);
+    connect(ui->lineEditDns1, &QLineEdit::textChanged, this, &MainWindow::on_lineEditIp_textChanged);
+    connect(ui->lineEditDns2, &QLineEdit::textChanged, this, &MainWindow::on_lineEditIp_textChanged);
+
+    connect(ui->groupBoxDns, &QGroupBox::toggled, this, &MainWindow::on_groupBoxAddress_toggled);
 
     readParameters();
     updateControls();
@@ -63,15 +69,42 @@ bool MainWindow::readParameters()
     ui->lineEditIp->setText(m_host.addr);
     ui->lineEditMask->setText(m_host.mask);
     ui->lineEditGateway->setText(m_host.gateway);
+    ui->lineEditDns1->setText(m_host.dns1);
+    ui->lineEditDns2->setText(m_host.dns2);
+    ui->groupBoxAddress->setChecked(!m_host.dhcp);
+    ui->groupBoxDns->setCheckable( m_host.dhcp );
+    if(m_host.dhcp) ui->groupBoxDns->setChecked(!m_host.autoDns);
 
     return true;
 }
 //==============================================================================
 void MainWindow::updateControls()
 {
-    bool ok = network_client::isCorrectIp(ui->lineEditIp->text())
+    bool ok {true};
+
+    if(ui->groupBoxAddress->isChecked()) {
+
+        if(ui->groupBoxDns->isCheckable()) {
+            ui->groupBoxDns->setChecked(true);
+            ui->groupBoxDns->setCheckable(false);
+            ui->groupBoxDns->setEnabled(true);
+        }
+
+        ok = ok && network_client::isCorrectIp(ui->lineEditIp->text())
             && network_client::isCorrectIp(ui->lineEditMask->text())
             && network_client::isCorrectIp(ui->lineEditGateway->text());
+    }
+    else if (!ui->groupBoxDns->isCheckable()) {
+        ui->groupBoxDns->setCheckable(true);
+    }
+
+    if(!ui->groupBoxDns->isCheckable() || ui->groupBoxDns->isChecked()) {
+
+        if(!ui->lineEditDns1->text().isEmpty())
+            ok = ok && network_client::isCorrectIp(ui->lineEditDns1->text());
+        if(!ui->lineEditDns2->text().isEmpty())
+            ok = ok && network_client::isCorrectIp(ui->lineEditDns2->text());
+    }
 
     ui->buttonBox->button(QDialogButtonBox::Ok)->setEnabled(ok);
 }
@@ -86,9 +119,20 @@ void MainWindow::on_buttonBox_accepted()
 {
     network_client::TcpIp4Struct host = m_host;
 
-    host.addr = ui->lineEditIp->text();
-    host.mask = ui->lineEditMask->text();
-    host.gateway = ui->lineEditGateway->text();
+    host.dhcp = !ui->groupBoxAddress->isChecked();
+
+    if(!host.dhcp) {
+        host.addr = ui->lineEditIp->text();
+        host.mask = ui->lineEditMask->text();
+        host.gateway = ui->lineEditGateway->text();
+    }
+
+    host.autoDns = ui->groupBoxDns->isCheckable() && !ui->groupBoxDns->isChecked();
+
+    if(!host.autoDns) {
+        host.dns1 = ui->lineEditDns1->text();
+        host.dns2 = ui->lineEditDns2->text();
+    }
 
     QString result;
 
@@ -107,5 +151,15 @@ void MainWindow::on_buttonBox_accepted()
 void MainWindow::on_buttonBox_rejected()
 {
     close();
+}
+//==============================================================================
+void MainWindow::on_groupBoxAddress_toggled(bool arg1)
+{
+    Q_UNUSED(arg1)
+    if(m_actionEnabled) {
+        m_actionEnabled = false;
+        updateControls();
+        m_actionEnabled = true;
+    }
 }
 //==============================================================================
