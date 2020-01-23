@@ -16,15 +16,15 @@
 
 namespace gui_utils { // =======================================================
 
-const QString organizationName = QObject::tr("ОАО \"Ленполиграфмаш\"");
-
 //==============================================================================
 void moveToCenterScreen(QWidget *widget, int screenNumber)
 {
     if(!widget) return;
-    if(screenNumber < 0 || screenNumber >= QApplication::screens().size() ) return;
+    if(screenNumber >= QApplication::screens().size() ) return;
 
-    QScreen* screen = QApplication::screens().at(screenNumber);
+        QScreen* screen = (screenNumber < 0)
+                ? QApplication::primaryScreen()
+                : QApplication::screens().at(screenNumber);
     widget->move( screen->availableGeometry().left()
                   + (screen->availableGeometry().width() - widget->geometry().width()) / 2,
                   screen->availableGeometry().top()

@@ -5,7 +5,7 @@
 
 namespace gui_utils { //========================================================
 
-void moveToCenterScreen(QWidget *widget, int screenNumber = 0);
+void moveToCenterScreen(QWidget *widget, int screenNumber = -1);
 void messageError(QWidget *parent, const QString &text);
 void messageWarning(QWidget *parent, const QString &text);
 void messageInfo(QWidget *parent, const QString &text);
