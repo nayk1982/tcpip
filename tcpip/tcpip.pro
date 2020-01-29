@@ -1,33 +1,16 @@
 QT       += core widgets gui network
 
-CONFIG += c++14
-
-DEFINES += QT_DEPRECATED_WARNINGS
+include( $${PWD}/../../_nayk/nayk.pri )
 
 QMAKE_CXXFLAGS += -Wno-deprecated-copy
 
 # Sources and Headers ==========================================================
 
-INCLUDEPATH += \
-    include
-
 SOURCES += \
-    src/gui_utils.cpp \
-    src/app_core.cpp \
-    src/file_sys.cpp \
-    src/network_client.cpp \
-    src/system_utils.cpp \
-    src/convert.cpp \
     main.cpp \
     mainwindow.cpp
 
 HEADERS += \
-    include/gui_utils.h \
-    include/app_core.h \
-    include/file_sys.h \
-    include/network_client.h \
-    include/system_utils.h \
-    include/convert.h \
     mainwindow.h
 
 FORMS += \
@@ -35,18 +18,7 @@ FORMS += \
 
 # Resources ====================================================================
 
-RESOURCES += \
-    main.qrc
-
 win32:RC_FILE = main.rc
-
-# Version and Build date =======================================================
-
-win32: BUILD_DATE = '$(shell echo %DATE:~6,4%-%DATE:~3,2%-%DATE:~0,2%)'
-else:  BUILD_DATE = '$(shell date +%Y-%m-%d)'
-VERSION  = 1.0
-DEFINES += APP_VERSION=\\\"$$VERSION\\\"
-DEFINES += APP_BUILD_DATE=\\\"$$BUILD_DATE\\\"
 
 # Output dir ===================================================================
 
