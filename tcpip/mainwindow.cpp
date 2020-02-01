@@ -61,7 +61,7 @@ bool MainWindow::readParameters()
     QString err;
     if(!network_client::hostSettings( m_host, err )) {
 
-        m_lastError = tr("Не удалось получить данные:\n%1").arg(err);
+        m_lastError = tr("Failed to get data:\n%1").arg(err);
         return false;
     }
 
@@ -144,7 +144,7 @@ void MainWindow::on_buttonBox_accepted()
         close();
     }
     else {
-        gui_utils::messageError(tr("Ошибка выполнения:\n%1").arg(result));
+        gui_utils::messageError(tr("Error running:\n%1").arg(result));
     }
 }
 //==============================================================================
