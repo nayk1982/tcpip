@@ -1,8 +1,8 @@
-QT       += core widgets gui network
+
+QT     += core widgets gui network
+VERSION = 1.0
 
 include( $${PWD}/../../_nayk/nayk.pri )
-
-QMAKE_CXXFLAGS += -Wno-deprecated-copy
 
 # Sources and Headers ==========================================================
 
