@@ -1,0 +1,8 @@
+module StyledControls
+StyledButton 1.0 StyledButton.qml
+StyledButtonOk 1.0 StyledButtonOk.qml
+StyledButtonCancel 1.0 StyledButtonCancel.qml
+StyledText 1.0 StyledText.qml
+StyledTextEdit 1.0 StyledTextEdit.qml
+StyledTextField 1.0 StyledTextField.qml
+StyledTextFieldOpenFile 1.0 StyledTextFieldOpenFile.qml

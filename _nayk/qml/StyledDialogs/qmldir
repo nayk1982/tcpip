@@ -1,0 +1,3 @@
+module StyledDialogs
+StyledAboutDialog 1.0 StyledAboutDialog.qml
+StyledMessageDialog 1.0 StyledMessageDialog.qml

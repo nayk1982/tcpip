@@ -1,0 +1,44 @@
+<RCC>
+    <qresource prefix="/">
+        <file>StyleSettings/qmldir</file>
+        <file>StyleSettings/Style.qml</file>
+        <file>StyledControls/images/ok.png</file>
+        <file>StyledControls/images/cancel.png</file>
+        <file>StyledDialogs/images/critical.png</file>
+        <file>StyledDialogs/images/information.png</file>
+        <file>StyledDialogs/images/question.png</file>
+        <file>StyledDialogs/images/warning.png</file>
+        <file>qtquickcontrols2.conf</file>
+        <file>StyledControls/qmldir</file>
+        <file>StyledControls/StyledButton.qml</file>
+        <file>StyledControls/StyledButtonCancel.qml</file>
+        <file>StyledControls/StyledButtonOk.qml</file>
+        <file>StyledControls/StyledText.qml</file>
+        <file>StyledControls/StyledTextEdit.qml</file>
+        <file>StyledControls/StyledTextField.qml</file>
+        <file>StyledControls/StyledTextFieldOpenFile.qml</file>
+        <file>StyledDialogs/qmldir</file>
+        <file>StyledDialogs/StyledAboutDialog.qml</file>
+        <file>StyledDialogs/StyledMessageDialog.qml</file>
+        <file>Utils/qmldir</file>
+        <file>Utils/Utils.qml</file>
+        <file>StyledControls/images/cancel@x2.png</file>
+        <file>StyledControls/images/cancel@x3.png</file>
+        <file>StyledControls/images/cancel@x4.png</file>
+        <file>StyledControls/images/ok@x2.png</file>
+        <file>StyledControls/images/ok@x3.png</file>
+        <file>StyledControls/images/ok@x4.png</file>
+        <file>StyledDialogs/images/critical@x2.png</file>
+        <file>StyledDialogs/images/critical@x3.png</file>
+        <file>StyledDialogs/images/critical@x4.png</file>
+        <file>StyledDialogs/images/information@x2.png</file>
+        <file>StyledDialogs/images/information@x3.png</file>
+        <file>StyledDialogs/images/information@x4.png</file>
+        <file>StyledDialogs/images/question@x2.png</file>
+        <file>StyledDialogs/images/question@x3.png</file>
+        <file>StyledDialogs/images/question@x4.png</file>
+        <file>StyledDialogs/images/warning@x2.png</file>
+        <file>StyledDialogs/images/warning@x3.png</file>
+        <file>StyledDialogs/images/warning@x4.png</file>
+    </qresource>
+</RCC>

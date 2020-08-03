@@ -1,6 +1,6 @@
 #include <QApplication>
 #include <QStyleFactory>
-#include "nayk/AppCore"
+#include "AppCore"
 #include "mainwindow.h"
 //==============================================================================
 int main(int argc, char *argv[])

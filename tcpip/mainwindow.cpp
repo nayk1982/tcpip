@@ -6,10 +6,10 @@
 #include <QRegExpValidator>
 #include <QDialogButtonBox>
 #include <QPushButton>
-#include "nayk/GuiUtils"
-#include "nayk/AppCore"
-#include "nayk/FileSys"
-#include "nayk/SystemUtils"
+#include "GuiUtils"
+#include "AppCore"
+#include "FileSys"
+#include "SystemUtils"
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 //==============================================================================
